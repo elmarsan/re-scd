@@ -129,7 +129,6 @@ proc main_02
         evt_next();
         set(FG_STOP, 7, 1);
         evt_next();
-        // main_03();
         evt_exec(3, I_GOSUB, main_03);
         evt_exec(4, I_GOSUB, skip_cutscene_01);
         set(FG_COMMON, 15, 1);
@@ -164,13 +163,9 @@ proc main_03
     main_1B();
     main_1C();
     main_04();
-    main_0A();    
-    work_set(WK_PLAYER, 0);
-    plc_ret();
-    sce_bgmtbl_set(0, 21, 1, 65329, 0);
-    set(FG_STATUS, 27, 0);
-    set(FG_ROOM, 0, 1);   
+    main_0A();
     evt_kill(4);
+    main_1F();
 }
 
 proc skip_cutscene_01
@@ -179,31 +174,34 @@ proc skip_cutscene_01
         if (sce_key_ck(1, 512))
         {
             break;
-        }  
+        }
         evt_next();
     } while(ck(FG_STATUS, 27, 1));
 
     evt_next();
-
+    // Fade out
+    sleep(10, 30);
+    sce_fade_set(2, 2, 7, 0, 2);
+    sleep(10, 60);
+    sce_fade_set(1, 2, 7, 0, 0);
+    sce_fade_adjust(1, 0, 127);
     main_04();
     main_0A();
-    work_set(WK_PLAYER, 0);
     pos_set(0, -23037, 0, -19397);
     dir_set(0, 0, 6203, 0);
-    plc_motion(0, 15, 0);    
-    work_set(WK_ENEMY, ID_EM_0);    
+    plc_motion(0, 15, 0);
+    work_set(WK_ENEMY, ID_EM_0);
     pos_set(0, -24574, 0, -19632);
     dir_set(0, 0, 3707, 0);
     plc_motion(0, 15, 0);
     plc_ret();
-    sleep(10, 2);
-    cut_chg(2);
-    work_set(WK_PLAYER, 0);
-    plc_ret();
-    sce_bgmtbl_set(0, 21, 1, 65329, 0);
-    set(FG_STATUS, 27, 0);
-    set(FG_ROOM, 0, 1);
+    main_1F();
     evt_kill(3);
+    // Fade in
+    sleep(10, 60);
+    sce_fade_adjust(1, 0, 0);
+    sce_fade_set(2, 2, 7, 0, 254);
+    sleep(10, 30);
 }
 
 proc main_04
@@ -838,4 +836,17 @@ proc main_1E
     {
         evt_next();
     } while (ck(FG_ROOM, 33, 0));
+}
+
+proc main_1F
+{
+    work_set(WK_PLAYER, 0);
+    plc_ret();
+    sce_bgmtbl_set(0, 21, 1, 65329, 0);
+    set(FG_STATUS, 27, 0);
+    set(FG_ROOM, 0, 1);
+    set(FG_COMMON, 15, 1);
+    cut_chg(2);
+    cut_auto(1);
+    set(FG_STOP, 7, 0);
 }
